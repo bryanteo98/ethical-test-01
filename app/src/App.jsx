@@ -5,13 +5,6 @@ import ReferrerApp from './components/dashboards/ReferrerApp.jsx';
 import PartnerApp from './components/dashboards/PartnerApp.jsx';
 import AdminApp from './components/dashboards/AdminApp.jsx';
 
-const TWEAK_DEFAULTS = {
-  logoX: 620,
-  logoY: -17,
-  logoSize: 567,
-  logoOpacity: 0.18,
-};
-
 function DemoNav({ page, setPage }) {
   const items = [
     { id: 'landing',  label: 'Landing'  },
@@ -47,7 +40,6 @@ function Toast({ message }) {
 export default function App() {
   const [page, setPage] = useState('landing');
   const [toast, setToast] = useState(null);
-  const [tweaks] = useState(TWEAK_DEFAULTS);
 
   const showToast = msg => {
     setToast(msg);
@@ -71,8 +63,8 @@ export default function App() {
   return (
     <>
       {page === 'landing'  && <Landing setPage={setPage} />}
-      {page === 'login'    && <Login    setPage={setPage} showToast={showToast} onAuth={role => setPage(role)} tweaks={tweaks} />}
-      {page === 'register' && <Register setPage={setPage} showToast={showToast} tweaks={tweaks} />}
+      {page === 'login'    && <Login    setPage={setPage} showToast={showToast} onAuth={role => setPage(role)} />}
+      {page === 'register' && <Register setPage={setPage} showToast={showToast} />}
       {page === 'referrer' && <ReferrerApp onSignOut={() => { showToast('Signed out'); setPage('landing'); }} showToast={showToast} />}
       {page === 'partner'  && <PartnerApp  onSignOut={() => { showToast('Signed out'); setPage('landing'); }} showToast={showToast} />}
       {page === 'admin'    && <AdminApp    onSignOut={() => { showToast('Signed out'); setPage('landing'); }} showToast={showToast} />}

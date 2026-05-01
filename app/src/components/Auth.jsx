@@ -51,17 +51,14 @@ export function AuthLeft({ mode, setPage }) {
   );
 }
 
-export function AuthRight({ children, tweaks }) {
-  const { logoX = 620, logoY = -17, logoSize = 567, logoOpacity = 0.18 } = tweaks || {};
+export function AuthRight({ children }) {
   return (
     <div className="auth-right">
       <div className="emblem-watermark" style={{
-        right: 'auto',
-        left: `${logoX}px`,
-        top: `calc(50% + ${logoY}px)`,
-        width: `${logoSize}px`,
-        height: `${logoSize}px`,
-        opacity: logoOpacity,
+        right: '-5%',
+        top: '50%',
+        width: '65vh',
+        height: '65vh',
         transform: 'translateY(-50%)',
       }}>
         <img src="/ethical-icon.svg" alt="" />
@@ -77,7 +74,7 @@ const DEMO_ACCOUNTS = {
   'admin@demo.com':   { pw: 'demo123', role: 'admin' },
 };
 
-export function Login({ setPage, showToast, onAuth, tweaks }) {
+export function Login({ setPage, showToast, onAuth }) {
   const [email, setEmail] = useState('ahmad@demo.com');
   const [pw, setPw] = useState('demo123');
   const [errs, setErrs] = useState({});
@@ -114,7 +111,7 @@ export function Login({ setPage, showToast, onAuth, tweaks }) {
     <div className="page active">
       <div className="auth">
         <AuthLeft mode="login" setPage={setPage} />
-        <AuthRight tweaks={tweaks}>
+        <AuthRight>
           <form className="auth-form" onSubmit={onSubmit} noValidate>
             <div className="form-eyebrow"><span className="dot" />Member access</div>
             <h2>Sign In</h2>
@@ -151,7 +148,7 @@ export function Login({ setPage, showToast, onAuth, tweaks }) {
   );
 }
 
-export function Register({ setPage, showToast, tweaks }) {
+export function Register({ setPage, showToast }) {
   const [role, setRole] = useState('referrer');
   const [name, setName]     = useState('');
   const [email, setEmail]   = useState('');
@@ -190,7 +187,7 @@ export function Register({ setPage, showToast, tweaks }) {
     <div className="page active">
       <div className="auth">
         <AuthLeft mode="register" setPage={setPage} />
-        <AuthRight tweaks={tweaks}>
+        <AuthRight>
           <form className="auth-form wide" onSubmit={onSubmit} noValidate>
             <div className="form-eyebrow"><span className="dot" />New application</div>
             <h2>Create Account</h2>
