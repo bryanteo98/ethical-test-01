@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ethical — An Entrepreneurial Collective</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400;1,700&family=EB+Garamond:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:        #f3f3e9;
+      --dark-panel:   #262220;
+      --orange:       #e8521a;
+      --orange-bg:    #f04e23;
+      --near-black:   #231f20;
+      --text:         #2e2e2e;
+      --text-muted:   #7a7a6e;
+      --border:       #c5c5b5;
+      --border-dark:  #3a3633;
+      --input-bg:     #f8f8f3;
+    }
+
+    body {
+      font-family: 'Manrope', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ─── Page Nav (demo switcher) ─────────────────────────────── */
+    .page-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      padding: 8px;
+      background: rgba(35,31,32,0.92);
+      backdrop-filter: blur(6px);
+    }
+    .page-nav button {
+      font-family: 'Manrope', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 18px;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 2px;
+      background: transparent;
+      color: rgba(255,255,255,0.55);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .page-nav button.active,
+    .page-nav button:hover {
+      background: var(--orange);
+      border-color: var(--orange);
+      color: #fff;
+    }
+
+    /* ─── Page Wrapper ─────────────────────────────────────────── */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ═══════════════════════════════════════════════════════════
+       LANDING PAGE
+    ═══════════════════════════════════════════════════════════ */
+    .landing {
+      width: 100%;
+      height: 100vh;
+      background: var(--cream);
+      position: relative;
+      overflow: hidden;
+      padding-top: 36px; /* space for demo nav */
+    }
+
+    /* NAV */
+    .nav {
+      position: absolute;
+      top: 36px; left: 0; right: 0;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 53px 0 31px;
+      z-index: 10;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    .nav-logo-icon {
+      width: 16px;
+      height: 16px;
+      color: var(--orange);
+    }
+    .nav-logo-text {
+      font-family: 'EB Garamond', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--near-black);
+      letter-spacing: -0.01em;
+    }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-sign-in {
+      font-family: 'Manrope', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--near-black);
+      background: transparent;
+      border: 1px solid var(--near-black);
+      padding: 0 18px;
+      height: 32px;
+      cursor: pointer;
+      letter-spacing: 0.01em;
+      transition: all 0.2s;
+    }
+    .btn-sign-in:hover { background: var(--near-black); color: #fff; }
+    .btn-get-started {
+      font-family: 'Manrope', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      background: var(--near-black);
+      border: 1px solid var(--near-black);
+      padding: 0 18px;
+      height: 32px;
+      cursor: pointer;
+      letter-spacing: 0.01em;
+      transition: all 0.2s;
+    }
+    .btn-get-started:hover { background: var(--orange); border-color: var(--orange); }
+
+    /* HERO TEXT */
+    .landing-tagline {
+      position: absolute;
+      top: 89px;
+      left: 32px;
+      width: 400px;
+      font-size: 13.5px;
+      font-weight: 400;
+      line-height: 1.65;
+      color: var(--text);
+    }
+    .landing-collective {
+      position: absolute;
+      top: 89px;
+      right: 224px;
+      font-family: 'Manrope', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+    }
+
+    /* ORANGE BOTTOM SECTION */
+    .landing-orange {
+      position: absolute;
+      bottom: 0;
+      left: 31px;
+      right: 224px;
+      height: 450px;
+      background: var(--orange-bg);
+      overflow: hidden;
+    }
+
+    /* Stats bar */
+    .stats-bar {
+      position: absolute;
+      top: 29px;
+      left: 0; right: 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      padding: 0 42px;
+      border-bottom: 1px solid rgba(255,255,255,0.25);
+      padding-bottom: 22px;
+    }
+    .stat-item {
+      flex: 1;
+      border-right: 1px solid rgba(255,255,255,0.25);
+      padding-right: 28px;
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-number {
+      font-family: 'EB Garamond', serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+    }
+    .stat-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.75);
+      letter-spacing: 0.03em;
+      margin-top: 4px;
+    }
+
+    /* Right side of orange: More than a network */
+    .landing-orange-right {
+      position: absolute;
+      top: 112px;
+      right: 0;
+      width: 287px;
+      border-left: 1px solid rgba(255,255,255,0.25);
+      padding: 0 0 0 32px;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-top: 0;
+    }
+    .emblem-circle {
+      width: 63px;
+      height: 63px;
+      border: 1.5px solid rgba(255,255,255,0.5);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: -10px;
+    }
+    .emblem-circle svg { color: rgba(255,255,255,0.7); }
+    .more-than-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.85);
+      letter-spacing: 0.03em;
+    }
+
+    /* Big Ethical text */
+    .big-ethical {
+      position: absolute;
+      bottom: -30px;
+      left: -8px;
+      right: 287px;
+      font-family: 'EB Garamond', serif;
+      font-size: clamp(80px, 16vw, 190px);
+      font-weight: 700;
+      color: var(--cream);
+      line-height: 0.82;
+      letter-spacing: -0.03em;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    /* Divider line between stats and big text */
+    .stats-divider {
+      position: absolute;
+      top: 144px;
+      left: 42px;
+      right: 287px;
+      height: 1px;
+      background: rgba(255,255,255,0.2);
+    }
+
+    /* Orange block to the right of main orange */
+    .landing-orange-cap {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 224px;
+      height: 450px;
+      background: var(--orange-bg);
+    }
+    .landing-orange-cap-inner {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 450px;
+      /* The notch effect is approximated */
+    }
+
+    /* Asterisk star small icon near bottom right */
+    .asterisk-sm {
+      position: absolute;
+      bottom: 140px;
+      right: 64px;
+      color: rgba(255,255,255,0.6);
+      font-size: 18px;
+      line-height: 1;
+    }
+
+
+    /* ═══════════════════════════════════════════════════════════
+       AUTH PAGES (shared layout)
+    ═══════════════════════════════════════════════════════════ */
+    .auth-page {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+      padding-top: 36px; /* demo nav */
+    }
+
+    /* Left dark panel */
+    .auth-left {
+      width: 340px;
+      min-width: 340px;
+      height: calc(100vh - 36px);
+      background: var(--dark-panel);
+      display: flex;
+      flex-direction: column;
+      padding: 28px 48px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    .auth-left-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      margin-bottom: 4px;
+    }
+    .auth-left-logo-text {
+      font-family: 'EB Garamond', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.01em;
+    }
+    .auth-left-subtitle {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 0;
+    }
+    .auth-left-heading {
+      margin-top: auto;
+      margin-bottom: 12px;
+    }
+    .auth-left-heading h2 {
+      font-family: 'EB Garamond', serif;
+      font-size: 38px;
+      font-weight: 400;
+      font-style: italic;
+      color: #fff;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+    .auth-left-desc {
+      font-size: 12px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.65;
+      max-width: 240px;
+    }
+    .auth-left-tiers {
+      margin-top: 60px;
+    }
+    .tier-item {
+      margin-bottom: 20px;
+    }
+    .tier-title {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .tier-num {
+      font-size: 10px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.04em;
+    }
+    .tier-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.85);
+    }
+    .tier-desc {
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      line-height: 1.55;
+      padding-left: 22px;
+    }
+
+    /* Right content area */
+    .auth-right {
+      flex: 1;
+      height: calc(100vh - 36px);
+      background: var(--cream);
+      display: flex;
+      align-items: center;
+      padding: 0 0 0 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Decorative emblem */
+    .auth-emblem {
+      position: absolute;
+      right: -80px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 520px;
+      height: 520px;
+      opacity: 0.08;
+      pointer-events: none;
+    }
+    .auth-emblem svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Form container */
+    .auth-form-wrap {
+      width: 280px;
+      position: relative;
+      z-index: 2;
+    }
+    .auth-form-title {
+      font-family: 'EB Garamond', serif;
+      font-size: 30px;
+      font-weight: 700;
+      color: var(--near-black);
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+    .auth-form-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 28px;
+    }
+
+    /* Form fields */
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-label {
+      display: block;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .form-input {
+      width: 100%;
+      height: 42px;
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 1px;
+      padding: 0 14px;
+      font-family: 'Manrope', sans-serif;
+      font-size: 13px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input::placeholder {
+      color: #b5b5a5;
+    }
+    .form-input:focus {
+      border-color: var(--near-black);
+    }
+
+    /* Two-col form grid */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .form-grid .form-group { margin-bottom: 0; }
+
+    /* Tabs */
+    .auth-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 24px;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .auth-tab {
+      flex: 1;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      transition: all 0.18s;
+      font-family: 'Manrope', sans-serif;
+      color: var(--text-muted);
+      letter-spacing: 0.01em;
+    }
+    .auth-tab.active {
+      background: var(--near-black);
+      color: #fff;
+    }
+    .auth-tab:not(.active):hover {
+      background: rgba(35,31,32,0.06);
+      color: var(--text);
+    }
+
+    /* Submit button */
+    .btn-submit {
+      width: 100%;
+      height: 42px;
+      background: var(--near-black);
+      color: #fff;
+      border: none;
+      font-family: 'Manrope', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+    .btn-submit:hover { background: var(--orange); }
+
+    /* Footer link */
+    .auth-footer-link {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 16px;
+    }
+    .auth-footer-link a {
+      color: var(--orange);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .auth-footer-link a:hover { text-decoration: underline; }
+
+    /* ─── Asterisk SVG icon ─── */
+    .icon-asterisk {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Demo page switcher -->
+  <nav class="page-nav">
+    <button class="active" onclick="showPage('landing', this)">🏠 Landing</button>
+    <button onclick="showPage('login', this)">🔐 Login</button>
+    <button onclick="showPage('register', this)">📝 Register</button>
+  </nav>
+
+
+  <!-- ════════════════════════════════════════
+       LANDING PAGE
+  ════════════════════════════════════════ -->
+  <div id="landing" class="page active">
+    <div class="landing">
+
+      <!-- Navbar -->
+      <nav class="nav">
+        <a href="#" class="nav-logo">
+          <svg class="icon-asterisk nav-logo-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line x1="8" y1="1" x2="8" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="1" y1="8" x2="15" y2="8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="2.93" y1="2.93" x2="13.07" y2="13.07" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="13.07" y1="2.93" x2="2.93" y2="13.07" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span class="nav-logo-text">Ethical</span>
+        </a>
+        <div class="nav-actions">
+          <button class="btn-sign-in" onclick="showPage('login', null)">Sign In</button>
+          <button class="btn-get-started" onclick="showPage('register', null)">Get Started</button>
+        </div>
+      </nav>
+
+      <!-- Hero tagline top-left -->
+      <p class="landing-tagline">
+        A dual-engine platform designed to bridge the gap between high-value connections and capital investment.
+      </p>
+
+      <!-- Collective top-right -->
+      <p class="landing-collective">An Entrepreneurial Collective</p>
+
+      <!-- Orange section (main) -->
+      <div class="landing-orange">
+        <!-- Stats row -->
+        <div class="stats-bar">
+          <div class="stat-item">
+            <div class="stat-number">500+</div>
+            <div class="stat-label">Active Referrers</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">120+</div>
+            <div class="stat-label">Vetted Partners</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">RM 2m+</div>
+            <div class="stat-label">Fees Distributed</div>
+          </div>
+          <div class="stat-item" style="border-right:none; padding-right:0;">
+            <div class="stat-number">98%</div>
+            <div class="stat-label">Client Satisfaction</div>
+          </div>
+        </div>
+
+        <!-- Divider line below stats -->
+        <div class="stats-divider"></div>
+
+        <!-- Right column: More than a network -->
+        <div class="landing-orange-right">
+          <div style="display:flex; align-items:center; gap:14px; padding-top: 0; margin-top: 0;">
+            <div class="emblem-circle">
+              <!-- Simple monogram -->
+              <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="14" cy="14" r="10" stroke="rgba(255,255,255,0.6)" stroke-width="1"/>
+                <text x="14" y="19" text-anchor="middle" font-family="EB Garamond, serif" font-size="14" font-weight="700" fill="rgba(255,255,255,0.6)">E</text>
+              </svg>
+            </div>
+          </div>
+          <p class="more-than-label" style="margin-top:8px;">More than a network</p>
+        </div>
+
+        <!-- Giant "Ethical" display text -->
+        <div class="big-ethical">Ethical</div>
+      </div>
+
+      <!-- Orange cap right (decorative overhang) -->
+      <div style="
+        position: absolute;
+        bottom: 0; right: 0;
+        width: 224px;
+        height: 450px;
+        background: var(--orange-bg);
+        clip-path: polygon(0 33%, 100% 0%, 100% 100%, 0% 100%);
+      "></div>
+
+      <!-- Asterisk small accent (bottom right of page) -->
+      <div style="
+        position: absolute;
+        right: 65px;
+        bottom: 200px;
+        color: rgba(255,255,255,0.5);
+        font-size: 16px;
+      ">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="7" y1="0" x2="7" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="0" y1="7" x2="14" y2="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="1.98" y1="1.98" x2="12.02" y2="12.02" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="12.02" y1="1.98" x2="1.98" y2="12.02" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════
+       LOGIN PAGE
+  ════════════════════════════════════════ -->
+  <div id="login" class="page">
+    <div class="auth-page">
+
+      <!-- Left dark panel -->
+      <div class="auth-left">
+        <!-- Logo -->
+        <a href="#" class="auth-left-logo">
+          <svg class="icon-asterisk" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="color:var(--orange);">
+            <line x1="8" y1="1" x2="8" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="1" y1="8" x2="15" y2="8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="2.93" y1="2.93" x2="13.07" y2="13.07" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="13.07" y1="2.93" x2="2.93" y2="13.07" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span class="auth-left-logo-text">Ethical</span>
+        </a>
+        <p class="auth-left-subtitle">More than a network</p>
+
+        <!-- Heading -->
+        <div class="auth-left-heading">
+          <h2>Welcome back.</h2>
+          <p class="auth-left-desc" style="margin-top:10px;">
+            Sign in to manage your referrals, leads and earnings.
+          </p>
+        </div>
+      </div>
+
+      <!-- Right form area -->
+      <div class="auth-right">
+
+        <!-- Decorative emblem -->
+        <div class="auth-emblem">
+          <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="200" cy="200" r="190" stroke="#2e2e2e" stroke-width="1.5"/>
+            <circle cx="200" cy="200" r="165" stroke="#2e2e2e" stroke-width="0.8"/>
+            <!-- Stylised E monogram -->
+            <text x="200" y="260" text-anchor="middle" font-family="EB Garamond, serif" font-size="200" font-weight="700" fill="#2e2e2e" opacity="0.9">E</text>
+            <!-- Small decorative dots -->
+            <circle cx="200" cy="18" r="3" fill="#2e2e2e"/>
+            <circle cx="200" cy="382" r="3" fill="#2e2e2e"/>
+            <circle cx="18" cy="200" r="3" fill="#2e2e2e"/>
+            <circle cx="382" cy="200" r="3" fill="#2e2e2e"/>
+          </svg>
+        </div>
+
+        <!-- Form -->
+        <div class="auth-form-wrap">
+          <h1 class="auth-form-title">Sign In</h1>
+          <p class="auth-form-subtitle">Enter your credentials to access your account.</p>
+
+          <form onsubmit="return false;">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-input" placeholder="ahmad@demo.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input type="password" class="form-input" placeholder="••••••••">
+            </div>
+            <button type="submit" class="btn-submit">Sign In</button>
+          </form>
+
+          <p class="auth-footer-link">
+            Don't have an account? <a href="#" onclick="showPage('register', null); return false;">Register</a>
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════════
+       REGISTER PAGE
+  ════════════════════════════════════════ -->
+  <div id="register" class="page">
+    <div class="auth-page">
+
+      <!-- Left dark panel -->
+      <div class="auth-left">
+        <!-- Logo -->
+        <a href="#" class="auth-left-logo">
+          <svg class="icon-asterisk" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="color:var(--orange);">
+            <line x1="8" y1="1" x2="8" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="1" y1="8" x2="15" y2="8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="2.93" y1="2.93" x2="13.07" y2="13.07" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <line x1="13.07" y1="2.93" x2="2.93" y2="13.07" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span class="auth-left-logo-text">Ethical</span>
+        </a>
+        <p class="auth-left-subtitle">More than a network</p>
+
+        <!-- Heading -->
+        <div class="auth-left-heading">
+          <h2>Join the network</h2>
+          <p class="auth-left-desc" style="margin-top:10px;">
+            Start Referring, Start Earning.
+          </p>
+        </div>
+
+        <!-- Tier info -->
+        <div class="auth-left-tiers">
+          <div class="tier-item">
+            <div class="tier-title">
+              <span class="tier-num">01</span>
+              <span class="tier-name">Silver Tier</span>
+            </div>
+            <p class="tier-desc">Start earning referral fees immediately upon approval.</p>
+          </div>
+          <div class="tier-item">
+            <div class="tier-title">
+              <span class="tier-num">02</span>
+              <span class="tier-name">Gold Tier</span>
+            </div>
+            <p class="tier-desc">Unlock higher rates by hitting quarterly milestones.</p>
+          </div>
+          <div class="tier-item">
+            <div class="tier-title">
+              <span class="tier-num">03</span>
+              <span class="tier-name">Partner Network</span>
+            </div>
+            <p class="tier-desc">Access curated professional services for your clients.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right form area -->
+      <div class="auth-right">
+
+        <!-- Decorative emblem (same as login) -->
+        <div class="auth-emblem">
+          <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="200" cy="200" r="190" stroke="#2e2e2e" stroke-width="1.5"/>
+            <circle cx="200" cy="200" r="165" stroke="#2e2e2e" stroke-width="0.8"/>
+            <text x="200" y="260" text-anchor="middle" font-family="EB Garamond, serif" font-size="200" font-weight="700" fill="#2e2e2e" opacity="0.9">E</text>
+            <circle cx="200" cy="18" r="3" fill="#2e2e2e"/>
+            <circle cx="200" cy="382" r="3" fill="#2e2e2e"/>
+            <circle cx="18" cy="200" r="3" fill="#2e2e2e"/>
+            <circle cx="382" cy="200" r="3" fill="#2e2e2e"/>
+          </svg>
+        </div>
+
+        <!-- Form -->
+        <div class="auth-form-wrap" style="width:320px;">
+          <h1 class="auth-form-title">Create Account</h1>
+          <p class="auth-form-subtitle">Choose your role to get started.</p>
+
+          <!-- Role tabs -->
+          <div class="auth-tabs">
+            <button class="auth-tab active" onclick="setTab(this)">Referrer</button>
+            <button class="auth-tab" onclick="setTab(this)">Partner</button>
+          </div>
+
+          <form onsubmit="return false;">
+            <!-- Row 1: Full Name + Email -->
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Full Name *</label>
+                <input type="text" class="form-input" placeholder="Ahmad Rizal">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email *</label>
+                <input type="email" class="form-input" placeholder="ahmad@email.com">
+              </div>
+            </div>
+
+            <!-- Row 2: Phone + Password -->
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Phone *</label>
+                <input type="tel" class="form-input" placeholder="0123456789">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Password *</label>
+                <input type="password" class="form-input" placeholder="••••••••">
+              </div>
+            </div>
+
+            <button type="submit" class="btn-submit">Create Account</button>
+          </form>
+
+          <p class="auth-footer-link">
+            Already have an account? <a href="#" onclick="showPage('login', null); return false;">Sign In</a>
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    function showPage(id, btn) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      if (btn) {
+        document.querySelectorAll('.page-nav button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      } else {
+        const labels = { landing: 0, login: 1, register: 2 };
+        const btns = document.querySelectorAll('.page-nav button');
+        btns.forEach(b => b.classList.remove('active'));
+        btns[labels[id]].classList.add('active');
+      }
+    }
+
+    function setTab(el) {
+      const tabs = el.closest('.auth-tabs').querySelectorAll('.auth-tab');
+      tabs.forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+    }
+  </script>
+
+</body>
+</html>
