@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import Asterisk from './Asterisk.jsx';
 import Field from './Field.jsx';
+import { registerUser, signInUser } from './api/setData.js';
+
+const ADMIN_LOGIN = {
+  email: 'admin@gmail.com',
+  password: 'adminadmin',
+  user: { full_name: 'Administrator', email: 'admin@gmail.com', role: 'admin' },
+};
 
 export function AuthLeft({ mode, setPage }) {
   return (
@@ -68,15 +75,9 @@ export function AuthRight({ children }) {
   );
 }
 
-const DEMO_ACCOUNTS = {
-  'ahmad@demo.com':   { pw: 'demo123', role: 'referrer' },
-  'partner@demo.com': { pw: 'demo123', role: 'partner' },
-  'admin@demo.com':   { pw: 'demo123', role: 'admin' },
-};
-
 export function Login({ setPage, showToast, onAuth }) {
-  const [email, setEmail] = useState('ahmad@demo.com');
-  const [pw, setPw] = useState('demo123');
+  const [email, setEmail] = useState('');
+  const [pw, setPw] = useState('');
   const [errs, setErrs] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -89,22 +90,28 @@ export function Login({ setPage, showToast, onAuth }) {
     return e;
   };
 
-  const onSubmit = e => {
+  const onSubmit = async e => {
     e.preventDefault();
     const err = validate();
     setErrs(err);
     if (Object.keys(err).length) return;
-    const acct = DEMO_ACCOUNTS[email.toLowerCase()];
-    if (!acct || acct.pw !== pw) {
-      setErrs({ pw: 'Invalid email or password' });
-      return;
-    }
     setLoading(true);
-    setTimeout(() => {
+    try {
+      const user = email.trim().toLowerCase() === ADMIN_LOGIN.email && pw === ADMIN_LOGIN.password
+        ? ADMIN_LOGIN.user
+        : await signInUser({ email, password: pw });
       setLoading(false);
-      showToast(`Signed in as ${acct.role}`);
-      onAuth(acct.role);
-    }, 900);
+      const role = user.role || 'referrer';
+      showToast(`Signed in as ${role}`);
+      onAuth(user);
+    } catch (error) {
+      setLoading(false);
+      if (error?.code === 'INVALID_CREDENTIALS') {
+        setErrs({ pw: 'Invalid email or password' });
+        return;
+      }
+      setErrs({ form: error.message || 'Unable to sign in' });
+    }
   };
 
   return (
@@ -119,15 +126,17 @@ export function Login({ setPage, showToast, onAuth }) {
 
             <Field label="Email" name="email" type="email"
               value={email} onChange={setEmail}
-              placeholder="ahmad@demo.com" error={errs.email} required />
+              placeholder="Email" error={errs.email} required />
             <Field label="Password" name="password" type="password"
               value={pw} onChange={setPw}
-              placeholder="••••••••" error={errs.pw} required />
+              placeholder="Password" error={errs.pw} required />
+
+            {errs.form && <div className="field-error">{errs.form}</div>}
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 6, gap: 12 }}>
-              <div style={{ font: '500 10px/1.4 Manrope, sans-serif', color: 'rgba(46,46,46,0.5)', letterSpacing: '0.04em' }}>
-                Demo: <b style={{ color: 'var(--dark)' }}>ahmad@demo.com</b> · <b style={{ color: 'var(--dark)' }}>partner@demo.com</b> · <b style={{ color: 'var(--dark)' }}>admin@demo.com</b>&nbsp;<span style={{ color: 'rgba(46,46,46,0.4)' }}>(pw: demo123)</span>
-              </div>
+              {/* <div style={{ font: '500 10px/1.4 Manrope, sans-serif', color: 'rgba(46,46,46,0.5)', letterSpacing: '0.04em' }}>
+                Demo: <b style={{ color: 'var(--dark)' }}>test67@gmail.com</b> · <b style={{ color: 'var(--dark)' }}>partner@demo.com</b> · <b style={{ color: 'var(--dark)' }}>admin@demo.com</b>&nbsp;<span style={{ color: 'rgba(46,46,46,0.4)' }}>(pw: demo123)</span>
+              </div> */}
               <a href="#" onClick={e => { e.preventDefault(); showToast('Reset link sent (demo)'); }}
                 style={{ font: '600 11px/1 Manrope, sans-serif', color: 'var(--muted)', textDecoration: 'none', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
                 Forgot password?
@@ -171,16 +180,35 @@ export function Register({ setPage, showToast }) {
     return e;
   };
 
-  const onSubmit = e => {
+  const onSubmit = async e => {
     e.preventDefault();
     const err = validate();
     setErrs(err);
     if (Object.keys(err).length) return;
     setLoading(true);
-    setTimeout(() => {
+    try {
+      await registerUser({
+        fullName: name,
+        email,
+        phoneNo: phone,
+        password: pw,
+        type: role === 'referrer' ? 'referrer' : 'partner',
+      });
       setLoading(false);
       showToast('Application received — review in 24–48h');
-    }, 1200);
+      setPage('login');
+    } catch (error) {
+      setLoading(false);
+      const isDuplicateEmail =
+        error?.code === 'EMAIL_EXISTS' ||
+        (error?.code === '23505' && /email/i.test(error.message || ''));
+      if (isDuplicateEmail) {
+        setErrs({ email: 'Email already registered' });
+        showToast('This email has already been registered');
+        return;
+      }
+      setErrs({ form: error.message || 'Unable to create account' });
+    }
   };
 
   return (
@@ -227,6 +255,8 @@ export function Register({ setPage, showToast }) {
                 placeholder="TechVision Sdn Bhd"
                 error={errs.company} required />
             )}
+
+              {errs.form && <div className="field-error">{errs.form}</div>}
 
             <button className={`submit ${loading ? 'loading' : ''}`} type="submit">
               {loading ? 'Submitting…' : <><span>Create Account</span> <span className="arrow">→</span></>}

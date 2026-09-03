@@ -1,0 +1,12 @@
+import { useState } from "react";
+import { PageHead } from "../Sidebar.jsx";
+import StatusPill from "../StatusPill.jsx";
+import { I } from "../Icons.jsx";
+
+export default function LeadsTab({ leads, showToast }) {
+  const [selected, setSelected] = useState(0);
+  const [filter, setFilter] = useState("All");
+  const visible = leads.filter((lead) => filter === "All" || lead.status === filter.toLowerCase());
+  const selectedLead = leads[selected] ?? leads[0];
+  return <><PageHead title="Assigned Leads" sub="Review and manage leads assigned to your organisation." /><div className="ftabs">{["All", "Accepted", "Ongoing", "Completed", "Declined"].map((tab) => <button key={tab} className={`ftab ${filter === tab ? "active" : ""}`} onClick={() => setFilter(tab)}>{tab}</button>)}</div><table className="tbl"><thead><tr><th>Client &amp; Company</th><th>Service</th><th>Referrer</th><th>Status</th><th>Action</th></tr></thead><tbody>{visible.map((lead) => { const index = leads.indexOf(lead); return <tr key={index} onClick={() => setSelected(index)} style={{ cursor: "pointer", background: selected === index ? "rgba(255,85,0,0.06)" : undefined }}><td><div className="strong">{lead.client}</div><div className="muted" style={{ marginTop: 4, fontSize: 11 }}>{lead.company}</div></td><td>{lead.svc}</td><td>{lead.referrer}</td><td><StatusPill status={lead.status} /></td><td><span style={{ color: "var(--orange)", cursor: "pointer" }}><I.eye />&nbsp;&nbsp;<I.edit /></span></td></tr>; })}</tbody></table>{selectedLead && <div className="detail-card"><div className="detail-card-head">Lead Detail — {selectedLead.client}</div><div className="detail-card-body"><div className="detail-row"><div className="k">Client</div><div className="v">{selectedLead.client}</div></div><div className="detail-row"><div className="k">Company</div><div className="v">{selectedLead.company}</div></div><div className="detail-row"><div className="k">Email</div><div className="v">{selectedLead.email}</div></div><div className="detail-row"><div className="k">Service</div><div className="v">{selectedLead.svc}</div></div><div className="detail-row"><div className="k">Status</div><div className="v"><StatusPill status={selectedLead.status} /></div></div><button className="action primary" style={{ marginTop: 16, width: "auto", padding: "12px 24px" }} onClick={() => showToast("Invoice draft generated for " + selectedLead.client)}><I.doc /> Generate Invoice — fees submission</button></div></div>}</>;
+}

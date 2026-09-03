@@ -61,6 +61,7 @@ export default function App() {
   // console.log(notes); // Log the full names of the notes
 
   const [page, setPage] = useState("landing");
+  const [currentUser, setCurrentUser] = useState(null);
   const [toast, setToast] = useState(null);
   const showToast = (msg) => {
     setToast(msg);
@@ -90,7 +91,10 @@ export default function App() {
         <Login
           setPage={setPage}
           showToast={showToast}
-          onAuth={(role) => setPage(role)}
+          onAuth={(user) => {
+            setCurrentUser(user);
+            setPage(user.role || "referrer");
+          }}
         />
       )}
       {page === "register" && (
@@ -98,7 +102,9 @@ export default function App() {
       )}
       {page === "referrer" && (
         <ReferrerApp
+          currentUser={currentUser}
           onSignOut={() => {
+            setCurrentUser(null);
             showToast("Signed out");
             setPage("landing");
           }}
@@ -108,6 +114,7 @@ export default function App() {
       {page === "partner" && (
         <PartnerApp
           onSignOut={() => {
+            setCurrentUser(null);
             showToast("Signed out");
             setPage("landing");
           }}
@@ -117,13 +124,14 @@ export default function App() {
       {page === "admin" && (
         <AdminApp
           onSignOut={() => {
+            setCurrentUser(null);
             showToast("Signed out");
             setPage("landing");
           }}
           showToast={showToast}
         />
       )}
-      <DemoNav page={page} setPage={setPage} />
+      {/* <DemoNav page={page} setPage={setPage} /> */}
       <Toast message={toast} />
     </>
   );

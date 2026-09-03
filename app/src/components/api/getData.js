@@ -10,3 +10,14 @@ export async function getAllEthicalUsers() {
 
   return data;
 }
+
+export async function getAllEthicalPartners() {
+  const { data, error } = await supabase.from("Ethical_partner").select("*");
+
+  if (error) {
+    console.error("Error fetching Ethical_partner rows:", error);
+    throw error;
+  }
+
+  return data;
+}
