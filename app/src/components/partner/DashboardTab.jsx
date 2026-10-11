@@ -2,6 +2,98 @@ import { PageHead } from "../Sidebar.jsx";
 import StatusPill from "../StatusPill.jsx";
 import { I } from "../Icons.jsx";
 
-export default function DashboardTab({ leads, onViewLeads, onViewInvoices, showToast }) {
-  return <><PageHead title="Overview" sub="Welcome back, Partner." /><div className="stat-grid"><div className="card"><div className="lbl">Assigned Leads</div><div className="val">3</div><div className="ftr">Active assignments</div></div><div className="card"><div className="lbl">Need Response</div><div className="val orange">2</div><div className="ftr">Incoming leads</div></div><div className="card"><div className="lbl">Ongoing</div><div className="val">1</div><div className="ftr">Processing</div></div><div className="card"><div className="lbl">Completed</div><div className="val">1</div><div className="ftr">Successfully closed</div></div></div><div className="action-row" style={{ gridTemplateColumns: "1fr 1fr" }}><button className="action" onClick={onViewLeads}><I.user /> Assigned Leads — view &amp; manage all leads</button><button className="action" onClick={onViewInvoices}><I.doc /> Invoices — fees requests &amp; submissions</button></div><div className="section-title">Active Assigned Leads</div><table className="tbl"><thead><tr><th>Client</th><th>Details</th><th>Referred By</th><th>Status</th><th>Assigned</th></tr></thead><tbody>{leads.map((lead, index) => <tr key={index}><td><div className="strong">{lead.client}</div><div className="muted" style={{ marginTop: 4, fontSize: 11 }}>{lead.company}</div></td><td className="muted">{lead.detail}</td><td>{lead.referrer}</td><td><StatusPill status={lead.status} /></td><td className="muted">{lead.date}</td></tr>)}</tbody></table><div className="detail-card-head" style={{ marginTop: 32 }}>Company Documents</div><div className="doc-row"><div className="doc" onClick={() => showToast("Downloading Company Profile…")}>Company Profile</div><div className="doc" onClick={() => showToast("Downloading Brand Guidelines…")}>Brand Guidelines</div><div className="doc" onClick={() => showToast("Downloading Referrer Playbook…")}>Referrer Playbook</div></div></>;
+export default function DashboardTab({
+  leads,
+  onViewLeads,
+  onViewInvoices,
+  showToast,
+}) {
+  return (
+    <>
+      <PageHead title="Overview" sub="Welcome back, Partner." />
+      <div className="stat-grid">
+        <div className="card">
+          <div className="lbl">Assigned Leads</div>
+          <div className="val">3</div>
+          <div className="ftr">Active assignments</div>
+        </div>
+        <div className="card">
+          <div className="lbl">Need Response</div>
+          <div className="val orange">2</div>
+          <div className="ftr">Incoming leads</div>
+        </div>
+        <div className="card">
+          <div className="lbl">Ongoing</div>
+          <div className="val">1</div>
+          <div className="ftr">Processing</div>
+        </div>
+        <div className="card">
+          <div className="lbl">Completed</div>
+          <div className="val">1</div>
+          <div className="ftr">Successfully closed</div>
+        </div>
+      </div>
+      <div className="action-row" style={{ gridTemplateColumns: "1fr 1fr" }}>
+        <button className="action" onClick={onViewLeads}>
+          <I.user /> Assigned Leads — view &amp; manage all leads
+        </button>
+        <button className="action" onClick={onViewInvoices}>
+          <I.doc /> Invoices — fees requests &amp; submissions
+        </button>
+      </div>
+      <div className="section-title">Active Assigned Leads</div>
+      <table className="tbl">
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Details</th>
+            <th>Referred By</th>
+            <th>Status</th>
+            <th>Assigned</th>
+          </tr>
+        </thead>
+        <tbody>
+          {leads.map((lead, index) => (
+            <tr key={index}>
+              <td>
+                <div className="strong">{lead.client}</div>
+                <div className="muted" style={{ marginTop: 4, fontSize: 11 }}>
+                  {lead.company}
+                </div>
+              </td>
+              <td className="muted">{lead.detail}</td>
+              <td>{lead.referrer}</td>
+              <td>
+                <StatusPill status={lead.status} />
+              </td>
+              <td className="muted">{lead.date}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="detail-card-head" style={{ marginTop: 32 }}>
+        Company Documents
+      </div>
+      <div className="doc-row">
+        <div
+          className="doc"
+          onClick={() => showToast("Downloading Company Profile…")}
+        >
+          Company Profile
+        </div>
+        <div
+          className="doc"
+          onClick={() => showToast("Downloading Brand Guidelines…")}
+        >
+          Brand Guidelines
+        </div>
+        <div
+          className="doc"
+          onClick={() => showToast("Downloading Referrer Playbook…")}
+        >
+          Referrer Playbook
+        </div>
+      </div>
+    </>
+  );
 }

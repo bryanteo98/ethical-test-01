@@ -6,6 +6,7 @@ import PartnerApp from "./components/dashboards/PartnerApp.jsx";
 import AdminApp from "./components/dashboards/AdminApp.jsx";
 // import { supabase } from "./utils/supabase.js";
 
+// eslint-disable-next-line no-unused-vars
 function DemoNav({ page, setPage }) {
   const items = [
     { id: "landing", label: "Landing" },
@@ -106,7 +107,7 @@ export default function App() {
           onSignOut={() => {
             setCurrentUser(null);
             showToast("Signed out");
-            setPage("landing");
+            setPage("login");
           }}
           showToast={showToast}
         />
@@ -116,7 +117,7 @@ export default function App() {
           onSignOut={() => {
             setCurrentUser(null);
             showToast("Signed out");
-            setPage("landing");
+            setPage("login");
           }}
           showToast={showToast}
         />
@@ -126,7 +127,7 @@ export default function App() {
           onSignOut={() => {
             setCurrentUser(null);
             showToast("Signed out");
-            setPage("landing");
+            setPage("login");
           }}
           showToast={showToast}
         />

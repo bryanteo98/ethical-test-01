@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Sidebar, { Bell } from "../Sidebar.jsx";
 import { I } from "../Icons.jsx";
 import { getAllEthicalUsers, getAllEthicalPartners } from "../api/getData.js";
+import { updateEthicalPartnerStatus } from "../api/setData.js";
 import OverviewTab from "../admin/OverviewTab.jsx";
 import UsersTab from "../admin/UsersTab.jsx";
 import LeadsTab from "../admin/LeadsTab.jsx";
@@ -28,6 +29,27 @@ export default function AdminApp({ onSignOut, showToast }) {
 
     fetchUsers();
   }, []);
+
+  const approvePartner = async (partner) => {
+    try {
+      await updateEthicalPartnerStatus(partner, "approved");
+      setEthicalPartners((currentPartners) =>
+        currentPartners.map((currentPartner) => {
+          const isMatch =
+            partner.id != null
+              ? currentPartner.id === partner.id
+              : currentPartner.company_name === partner.company_name;
+          return isMatch
+            ? { ...currentPartner, status: "approved" }
+            : currentPartner;
+        }),
+      );
+      showToast(`${partner.company_name ?? "Partner"} approved`);
+    } catch (error) {
+      console.error("Failed to approve partner:", error);
+      showToast(error.message || "Unable to approve partner");
+    }
+  };
 
   useEffect(() => {
     const fetchPartners = async () => {
@@ -56,11 +78,26 @@ export default function AdminApp({ onSignOut, showToast }) {
 
   return (
     <div className="app">
-      <Sidebar nav={nav} active={active} onNav={setActive} user={user} onSignOut={onSignOut} />
+      <Sidebar
+        nav={nav}
+        active={active}
+        onNav={setActive}
+        user={user}
+        onSignOut={onSignOut}
+      />
       <main className="main">
         <Bell count={3} />
-        {active === "overview" && <OverviewTab onNavigate={setActive} showToast={showToast} />}
-        {active === "users" && <UsersTab ethicalUsers={ethicalUsers} ethicalPartners={ethicalPartners} showToast={showToast} />}
+        {active === "overview" && (
+          <OverviewTab onNavigate={setActive} showToast={showToast} />
+        )}
+        {active === "users" && (
+          <UsersTab
+            ethicalUsers={ethicalUsers}
+            ethicalPartners={ethicalPartners}
+            showToast={showToast}
+            onApprovePartner={approvePartner}
+          />
+        )}
         {active === "leads" && <LeadsTab />}
         {active === "invoices" && <InvoicesTab />}
         {active === "vouchers" && <VouchersTab />}
