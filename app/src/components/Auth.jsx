@@ -141,6 +141,10 @@ export function Login({ setPage, showToast, onAuth }) {
       onAuth(user);
     } catch (error) {
       setLoading(false);
+      if (error?.code === "PARTNER_NOT_APPROVED") {
+        showToast(error.message);
+        return;
+      }
       if (error?.code === "INVALID_CREDENTIALS") {
         setErrs({ pw: "Invalid email or password" });
         return;

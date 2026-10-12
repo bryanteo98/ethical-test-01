@@ -121,6 +121,14 @@ export async function signInUser({ email, password }) {
     throw authenticationError;
   }
 
+  if (isPartner && partnerAccount?.status?.trim().toLowerCase() !== "approved") {
+    const approvalError = new Error(
+      "Please contact the admin to approve your account.",
+    );
+    approvalError.code = "PARTNER_NOT_APPROVED";
+    throw approvalError;
+  }
+
   const safeUser = isPartner
     ? { ...userAccount, ...partnerAccount }
     : { ...userAccount };
