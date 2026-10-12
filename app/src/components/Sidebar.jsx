@@ -1,25 +1,83 @@
+import { useState } from "react";
 import Asterisk from './Asterisk.jsx';
 import { I } from './Icons.jsx';
 
-export function Bell({ count }) {
+export function Bell({
+  count,
+  notifications = [],
+  onNotificationClick,
+  showZero = false,
+  interactive = false,
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <div style={{ position: 'absolute', top: 18, right: 32, cursor: 'pointer' }}>
-      <div style={{
-        width: 36, height: 36, background: 'var(--cream-2)', color: 'var(--dark)',
-        display: 'grid', placeItems: 'center',
-        clipPath: 'polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)',
-        position: 'relative',
-      }}>
-        <I.bell />
-        {count > 0 && (
+    <div style={{ position: 'absolute', top: 18, right: 32, zIndex: 20 }}>
+      <button
+        type="button"
+        aria-label={`Notifications: ${count}`}
+        aria-expanded={isOpen}
+        onClick={() => interactive && setIsOpen((open) => !open)}
+        disabled={!interactive}
+        style={{
+          width: 36, height: 36, background: 'transparent', color: 'var(--dark)',
+          display: 'grid', placeItems: 'center', border: 0,
+          cursor: interactive ? 'pointer' : 'default', overflow: 'visible',
+          position: 'relative',
+        }}
+      >
+        <span style={{
+          width: 36, height: 36, background: 'var(--cream-2)', color: 'var(--dark)',
+          display: 'grid', placeItems: 'center',
+          clipPath: 'polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)',
+        }}>
+          <I.bell />
+        </span>
+        {(showZero || count > 0) && (
           <span style={{
-            position: 'absolute', top: -6, right: -10,
+            position: 'absolute', top: -5, right: -8, zIndex: 1,
             background: 'var(--orange)', color: 'var(--cream)',
             font: '700 9px/1 Manrope, sans-serif', padding: '3px 5px',
             minWidth: 16, textAlign: 'center',
           }}>{count}</span>
         )}
-      </div>
+      </button>
+      {interactive && isOpen && (
+        <div style={{
+          position: 'absolute', top: 44, right: 0, width: 300, maxWidth: 'calc(100vw - 32px)',
+          padding: 16, background: 'var(--cream)', color: 'var(--dark)',
+          border: '1px solid var(--hairline)', borderTop: '2px solid var(--orange)',
+          boxShadow: '0 12px 32px rgba(35,31,32,0.18)',
+        }}>
+          <div style={{ font: '700 11px/1.4 Manrope, sans-serif', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 10 }}>
+            Partner approvals
+          </div>
+          {notifications.length === 0 ? (
+            <div style={{ font: '500 12px/1.5 Manrope, sans-serif', color: 'var(--muted)' }}>
+              No partner approvals pending.
+            </div>
+          ) : notifications.map((notification) => (
+            <button
+              key={notification.id ?? notification.email ?? notification.company_name}
+              type="button"
+              onClick={() => {
+                onNotificationClick?.(notification);
+                setIsOpen(false);
+              }}
+              style={{
+                display: 'block', width: '100%', padding: '10px 0', textAlign: 'left',
+                background: 'transparent', border: 0, borderTop: '1px solid var(--hairline)',
+                color: 'var(--dark)', cursor: 'pointer', font: '600 12px/1.4 Manrope, sans-serif',
+              }}
+            >
+              {notification.company_name || 'Unnamed company'}
+              <span style={{ display: 'block', marginTop: 3, color: 'var(--muted)', font: '500 10px/1.4 Manrope, sans-serif' }}>
+                {notification.email} · {notification.status || 'Pending'} — review
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

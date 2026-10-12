@@ -238,10 +238,11 @@ function PartnersTable({
 export default function UsersTab({
   ethicalUsers,
   ethicalPartners,
+  initialTab = "All",
   showToast,
   onApprovePartner,
 }) {
-  const [usersTab, setUsersTab] = useState("All");
+  const [usersTab, setUsersTab] = useState(initialTab);
   const [currentPageUsers, setCurrentPageUsers] = useState(1);
   const [currentPagePartners, setCurrentPagePartners] = useState(1);
   const pageSize = usersTab === "Referrers" ? 10 : 5;

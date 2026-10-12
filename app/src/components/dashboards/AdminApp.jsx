@@ -15,6 +15,9 @@ export default function AdminApp({ onSignOut, showToast }) {
   const [active, setActive] = useState("overview");
   const [ethicalUsers, setEthicalUsers] = useState([]);
   const [ethicalPartners, setEthicalPartners] = useState([]);
+  const unapprovedPartners = ethicalPartners.filter(
+    (partner) => String(partner.status ?? "pending").trim().toLowerCase() !== "approved",
+  );
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -86,7 +89,15 @@ export default function AdminApp({ onSignOut, showToast }) {
         onSignOut={onSignOut}
       />
       <main className="main">
-        <Bell count={3} />
+        <Bell
+          count={unapprovedPartners.length > 0 ? 1 : 0}
+          showZero
+          interactive
+          notifications={unapprovedPartners}
+          onNotificationClick={() => {
+            setActive("users");
+          }}
+        />
         {active === "overview" && (
           <OverviewTab onNavigate={setActive} showToast={showToast} />
         )}
@@ -94,6 +105,7 @@ export default function AdminApp({ onSignOut, showToast }) {
           <UsersTab
             ethicalUsers={ethicalUsers}
             ethicalPartners={ethicalPartners}
+            initialTab="Partners"
             showToast={showToast}
             onApprovePartner={approvePartner}
           />
