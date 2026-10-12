@@ -114,6 +114,8 @@ export default function App() {
       )}
       {page === "partner" && (
         <PartnerApp
+          currentUser={currentUser}
+          onUserUpdate={setCurrentUser}
           onSignOut={() => {
             setCurrentUser(null);
             showToast("Signed out");

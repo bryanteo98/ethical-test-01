@@ -124,6 +124,16 @@ export async function signInUser({ email, password }) {
   const safeUser = isPartner
     ? { ...userAccount, ...partnerAccount }
     : { ...userAccount };
+  const onboardingRecord =
+    partnerAccount && Object.hasOwn(partnerAccount, "first_login")
+      ? ["Ethical_partner", partnerAccount]
+      : userAccount && Object.hasOwn(userAccount, "first_login")
+        ? ["Ethical_user", userAccount]
+        : partnerAccount
+          ? ["Ethical_partner", partnerAccount]
+          : ["Ethical_user", userAccount];
+  safeUser.profile_table = onboardingRecord[0];
+  safeUser.profile_id = onboardingRecord[1]?.id ?? null;
   delete safeUser.password_hash;
   safeUser.role = isPartner
     ? "partner"
@@ -189,6 +199,7 @@ export async function registerUser({
         owner_name: fullName.trim(),
         email: normalizedEmail,
         password_hash: passwordHash,
+        first_login: true,
         status: "pending",
       })
       .select()
@@ -250,6 +261,42 @@ export async function updateEthicalPartnerStatus(partner, status) {
   }
   if (!data) {
     throw new Error("Partner status was not updated");
+  }
+
+  return data;
+}
+
+export async function updatePartnerFirstLoginProfile(user, profile) {
+  const table =
+    user?.profile_table === "Ethical_user"
+      ? "Ethical_user"
+      : user?.profile_table === "Ethical_partner"
+        ? "Ethical_partner"
+        : null;
+
+  if (!table || (!user?.profile_id && !user?.email)) {
+    throw new Error("Partner profile is missing an identifier");
+  }
+
+  const { data, error } = await supabase
+    .from(table)
+    .update({
+      ssm_no: profile.ssm_no.trim(),
+      industry: profile.industry.trim(),
+      website: profile.website.trim(),
+      contact_no: profile.contact_no.trim(),
+      first_login: false,
+    })
+    .eq(user.profile_id ? "id" : "email", user.profile_id || user.email)
+    .select()
+    .maybeSingle();
+
+  if (error) {
+    console.error(`Error updating ${table} first-login profile:`, error);
+    throw error;
+  }
+  if (!data) {
+    throw new Error("Partner profile was not updated");
   }
 
   return data;

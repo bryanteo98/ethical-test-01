@@ -4,13 +4,17 @@ import { I } from "../Icons.jsx";
 
 export default function DashboardTab({
   leads,
+  companyName,
   onViewLeads,
   onViewInvoices,
   showToast,
 }) {
   return (
     <>
-      <PageHead title="Overview" sub="Welcome back, Partner." />
+      <PageHead
+        title={companyName || "Overview"}
+        sub="Welcome to your partner dashboard."
+      />
       <div className="stat-grid">
         <div className="card">
           <div className="lbl">Assigned Leads</div>
