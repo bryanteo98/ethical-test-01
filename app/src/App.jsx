@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Landing from "./components/Landing.jsx";
 import { Login, Register } from "./components/Auth.jsx";
 import ReferrerApp from "./components/dashboards/ReferrerApp.jsx";
@@ -64,10 +64,10 @@ export default function App() {
   const [page, setPage] = useState("landing");
   const [currentUser, setCurrentUser] = useState(null);
   const [toast, setToast] = useState(null);
-  const showToast = (msg) => {
+  const showToast = useCallback((msg) => {
     setToast(msg);
     setTimeout(() => setToast(null), 2400);
-  };
+  }, []);
   useEffect(() => {
     const onKey = (e) => {
       if (
