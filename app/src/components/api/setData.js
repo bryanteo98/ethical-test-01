@@ -329,7 +329,7 @@ export async function createEthicalLead({
   const { data, error } = await supabase
     .from("Ethical_lead")
     .insert({
-      refferrer_id: referrerId,
+      referrer_id: referrerId,
       full_name: fullName.trim(),
       company: company.trim(),
       service_category: serviceCategory.trim(),
