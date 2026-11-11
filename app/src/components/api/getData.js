@@ -23,3 +23,21 @@ export async function getAllEthicalPartners() {
 
   return data;
 }
+
+export async function getEthicalLeadsByReferrer(referrerId) {
+  if (referrerId == null || referrerId === "") {
+    throw new Error("Referrer record is missing an identifier");
+  }
+
+  const { data, error } = await supabase
+    .from("Ethical_lead")
+    .select("*")
+    .eq("referrer_id", referrerId);
+
+  if (error) {
+    console.error("Error fetching Ethical_lead rows:", error);
+    throw error;
+  }
+
+  return data;
+}

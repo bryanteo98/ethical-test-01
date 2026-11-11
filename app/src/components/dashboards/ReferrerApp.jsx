@@ -1,13 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Sidebar, { Bell } from "../Sidebar.jsx";
 import Field from "../Field.jsx";
 import { I } from "../Icons.jsx";
+import { getEthicalLeadsByReferrer } from "../api/getData.js";
+import { createEthicalLead } from "../api/setData.js";
 import DashboardTab from "../referrer/DashboardTab.jsx";
 import LeadsTab from "../referrer/LeadsTab.jsx";
 import HistoryTab from "../referrer/HistoryTab.jsx";
 import SettingsTab from "../referrer/SettingsTab.jsx";
 
-function AddLeadModal({ onClose, onSave }) {
+function toLeadViewModel(lead) {
+  const submittedAt = lead.created_at ?? lead.submitted_at;
+  const submittedDate = submittedAt ? new Date(submittedAt) : null;
+
+  return {
+    client: lead.full_name,
+    company: lead.company,
+    svc: lead.service_category,
+    partner: lead.partner_name || "—",
+    status: String(lead.status || "pending").toLowerCase(),
+    date:
+      submittedDate && !Number.isNaN(submittedDate.getTime())
+        ? submittedDate.toLocaleDateString("en-GB")
+        : "—",
+  };
+}
+
+function AddLeadModal({ onClose, onSave, isSaving }) {
   const [client, setClient] = useState("");
   const [company, setCompany] = useState("");
   const [svc, setSvc] = useState("");
@@ -56,6 +75,7 @@ function AddLeadModal({ onClose, onSave }) {
               border: "1px solid var(--dark)",
             }}
             onClick={onClose}
+            disabled={isSaving}
           >
             Cancel
           </button>
@@ -63,10 +83,13 @@ function AddLeadModal({ onClose, onSave }) {
             className="action primary"
             style={{ flex: 1 }}
             onClick={() => {
-              if (client && company && svc) onSave({ client, company, svc });
+              if (client.trim() && company.trim() && svc.trim()) {
+                onSave({ client, company, svc });
+              }
             }}
+            disabled={isSaving}
           >
-            Submit
+            {isSaving ? "Submitting..." : "Submit"}
           </button>
         </div>
       </div>
@@ -78,40 +101,8 @@ export default function ReferrerApp({ currentUser, onSignOut, showToast }) {
   const [active, setActive] = useState("dashboard");
   const [initialLeadFilter, setInitialLeadFilter] = useState("All");
   const [showAdd, setShowAdd] = useState(false);
-  const [leads, setLeads] = useState([
-    {
-      client: "Razif Hakim",
-      company: "BizTech Solutions",
-      svc: "IT Consulting",
-      partner: "TechVision Sdn Bhd",
-      status: "completed",
-      date: "10/10/2024",
-    },
-    {
-      client: "Farah Liana",
-      company: "Global Traders Sdn",
-      svc: "Corporate Law",
-      partner: "LexPro Legal",
-      status: "ongoing",
-      date: "10/10/2024",
-    },
-    {
-      client: "Melissa Wong",
-      company: "Crystal Events",
-      svc: "IT Consulting",
-      partner: "—",
-      status: "pending",
-      date: "10/10/2024",
-    },
-    {
-      client: "Ahmad Test",
-      company: "Demo Corp",
-      svc: "Financial Planning",
-      partner: "—",
-      status: "verified",
-      date: "10/10/2024",
-    },
-  ]);
+  const [leads, setLeads] = useState([]);
+  const [isSavingLead, setIsSavingLead] = useState(false);
   const nav = [
     { id: "dashboard", label: "Dashboard", icon: I.grid },
     { id: "leads", label: "My Leads", icon: I.swap },
@@ -126,19 +117,53 @@ export default function ReferrerApp({ currentUser, onSignOut, showToast }) {
     initial: (currentUser?.full_name || "R").charAt(0).toUpperCase(),
     tier: "GOLD",
   };
+
+  useEffect(() => {
+    let isCurrent = true;
+
+    const fetchLeads = async () => {
+      if (currentUser?.id == null) {
+        setLeads([]);
+        return;
+      }
+
+      try {
+        const records = await getEthicalLeadsByReferrer(currentUser.id);
+        if (isCurrent) setLeads((records ?? []).map(toLeadViewModel));
+      } catch (error) {
+        console.error("Failed to fetch referrer leads:", error);
+        if (isCurrent) {
+          setLeads([]);
+          showToast(error.message || "Unable to load your leads");
+        }
+      }
+    };
+
+    fetchLeads();
+    return () => {
+      isCurrent = false;
+    };
+  }, [currentUser?.id, showToast]);
+
   const openAddLead = () => setShowAdd(true);
-  const saveLead = (lead) => {
-    setLeads([
-      {
-        ...lead,
-        status: "pending",
-        date: new Date().toLocaleDateString("en-GB"),
-        partner: "—",
-      },
-      ...leads,
-    ]);
-    setShowAdd(false);
-    showToast("Lead submitted — pending verification");
+  const saveLead = async ({ client, company, svc }) => {
+    setIsSavingLead(true);
+    try {
+      const savedLead = await createEthicalLead({
+        referrerId: currentUser?.id,
+        fullName: client,
+        company,
+        serviceCategory: svc,
+      });
+      setLeads((currentLeads) => [toLeadViewModel(savedLead), ...currentLeads]);
+      setShowAdd(false);
+      showToast("Lead submitted — pending verification");
+    } catch (error) {
+      console.error("Failed to submit referrer lead:", error);
+      showToast(error.message || "Unable to submit lead");
+    } finally {
+      setIsSavingLead(false);
+    }
   };
 
   const handleNav = (nextPage) => {
@@ -180,7 +205,11 @@ export default function ReferrerApp({ currentUser, onSignOut, showToast }) {
         {active === "history" && <HistoryTab />}
         {active === "settings" && <SettingsTab user={user} />}
         {showAdd && (
-          <AddLeadModal onClose={() => setShowAdd(false)} onSave={saveLead} />
+          <AddLeadModal
+            onClose={() => setShowAdd(false)}
+            onSave={saveLead}
+            isSaving={isSavingLead}
+          />
         )}
       </main>
     </div>

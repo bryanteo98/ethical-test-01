@@ -309,3 +309,35 @@ export async function updatePartnerFirstLoginProfile(user, profile) {
 
   return data;
 }
+
+export async function createEthicalLead({
+  referrerId,
+  fullName,
+  company,
+  serviceCategory,
+}) {
+  if (referrerId == null || referrerId === "") {
+    throw new Error("Referrer record is missing an identifier");
+  }
+  if (!fullName?.trim() || !company?.trim() || !serviceCategory?.trim()) {
+    throw new Error("Client name, company, and service needed are required");
+  }
+
+  const { data, error } = await supabase
+    .from("Ethical_lead")
+    .insert({
+      refferrer_id: referrerId,
+      full_name: fullName.trim(),
+      company: company.trim(),
+      service_category: serviceCategory.trim(),
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Error creating Ethical_lead row:", error);
+    throw error;
+  }
+
+  return data;
+}
