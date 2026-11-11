@@ -2,6 +2,23 @@ import { PageHead } from "../Sidebar.jsx";
 import StatusPill from "../StatusPill.jsx";
 import { I } from "../Icons.jsx";
 
+function getQuarterlyLeadCount(leads) {
+  const now = new Date();
+  const quarterStartMonth = Math.floor(now.getMonth() / 3) * 3;
+  const quarterStart = new Date(now.getFullYear(), quarterStartMonth, 1);
+  const nextQuarterStart = new Date(now.getFullYear(), quarterStartMonth + 3, 1);
+
+  return leads.filter((lead) => {
+    const joinedAt = lead.joinedAt;
+    return (
+      joinedAt instanceof Date &&
+      !Number.isNaN(joinedAt.getTime()) &&
+      joinedAt >= quarterStart &&
+      joinedAt < nextQuarterStart
+    );
+  }).length;
+}
+
 export default function DashboardTab({
   user,
   leads,
@@ -20,7 +37,7 @@ export default function DashboardTab({
         </div>
         <div className="card">
           <div className="lbl">Total Leads</div>
-          <div className="val">14</div>
+          <div className="val">{leads.length}</div>
           <div className="ftr">Referrals made</div>
         </div>
         <div className="card">
@@ -30,7 +47,7 @@ export default function DashboardTab({
         </div>
         <div className="card">
           <div className="lbl">Quarterly Referrals</div>
-          <div className="val">11</div>
+          <div className="val">{getQuarterlyLeadCount(leads)}</div>
           <div className="ftr">This quarter</div>
         </div>
       </div>

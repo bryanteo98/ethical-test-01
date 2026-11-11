@@ -9,9 +9,17 @@ import LeadsTab from "../referrer/LeadsTab.jsx";
 import HistoryTab from "../referrer/HistoryTab.jsx";
 import SettingsTab from "../referrer/SettingsTab.jsx";
 
+function parseLeadDate(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
 function toLeadViewModel(lead) {
-  const submittedAt = lead.created_at ?? lead.submitted_at;
-  const submittedDate = submittedAt ? new Date(submittedAt) : null;
+  const joinedAt =
+    [lead.joined_at, lead.created_at, lead.submitted_at]
+      .map(parseLeadDate)
+      .find(Boolean) ?? null;
 
   return {
     client: lead.full_name,
@@ -19,10 +27,8 @@ function toLeadViewModel(lead) {
     svc: lead.service_category,
     partner: lead.partner_name || "—",
     status: String(lead.status || "pending").toLowerCase(),
-    date:
-      submittedDate && !Number.isNaN(submittedDate.getTime())
-        ? submittedDate.toLocaleDateString("en-GB")
-        : "—",
+    joinedAt,
+    date: joinedAt ? joinedAt.toLocaleDateString("en-GB") : "—",
   };
 }
 
